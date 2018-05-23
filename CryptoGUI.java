@@ -1,3 +1,4 @@
+// imports
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.GridBagConstraints;
@@ -6,9 +7,8 @@ import javax.swing.filechooser.*;
 import javax.swing.Timer;
 import java.io.File;
 
-
+// Create a GUI to encrypt and decrypt files
 public class CryptoGUI extends JPanel {
-	
 	private JPanel keyPanel, keyPanel2, inPanel, outPanel, buttonPanel, encryptPanel, decryptPanel;
 	private JLabel keyLabel, inLabel, outLabel, statusLabel;
 	private JTextArea keyArea, inArea, outArea;
@@ -16,21 +16,18 @@ public class CryptoGUI extends JPanel {
 	private JButton inButton, outButton, encryptButton, decryptButton;
 	private File inFile, outFile, selectFile;
 	
-
+	// create GridBagConstraints
 	private GridBagConstraints createGBC(int x, int y) {
-		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = x;
 		c.gridy = y;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = (x == 0) ? GridBagConstraints.WEST : GridBagConstraints.EAST;
-		
 		return c;
 	}
 
-
+	// create CryptoGUI
 	public CryptoGUI() {
-		
 		// init files
 		this.inFile = null;
 		this.outFile = null;
@@ -123,27 +120,24 @@ public class CryptoGUI extends JPanel {
 		add(this.statusLabel, c);
 	}
 
-	
+	// get file name without extension
 	private static String getNameNoExtension(String s) {
-		
 		int sep = s.lastIndexOf("/") + 1;
 		String ss = s.substring(sep);
 		int dot = ss.indexOf(".");
 		return ss.substring(0, dot);
 	}
 
-	
-	
+	// get file extension
 	private static String getExtension(String s) {
-		
 		int dot = s.lastIndexOf(".") + 1;
 		return s.substring(dot);
 	}
-
-	private class InListener implements ActionListener {
 	
+	// listener for the input file button
+	private class InListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			
+			// init JFileChooser
 			JFileChooser fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			int val = fc.showOpenDialog(CryptoGUI.this);
@@ -154,11 +148,10 @@ public class CryptoGUI extends JPanel {
 		}
 	}
 
-
+	// listener for the output file button
 	private class OutListener implements ActionListener {
-		
 		public void actionPerformed(ActionEvent e) {
-			
+			// init JFileChooser
 			JFileChooser fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			int val = fc.showOpenDialog(CryptoGUI.this);
@@ -169,11 +162,11 @@ public class CryptoGUI extends JPanel {
 		}
 	}
 	
+	// listener for the encrypt button
 	private class EncryptListener implements ActionListener {
-		
 		public void actionPerformed(ActionEvent e) {
-			
 			try {
+				// get output file
 				try {
 					if (CryptoGUI.this.selectFile.isDirectory()) {
 						CryptoGUI.this.outFile = new File(CryptoGUI.this.selectFile.getAbsolutePath() + "/" + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile.getAbsolutePath()) + ".enc." + CryptoGUI.getExtension(CryptoGUI.this.inFile.getAbsolutePath()));
@@ -183,8 +176,11 @@ public class CryptoGUI extends JPanel {
 				} catch (Exception e1) {
 					throw new MyCryptoUtils.CustomException(e1.getClass().getSimpleName());
 				}
-
+				
+				// encrypt file
 				MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
+				
+				// status report
 				Timer timer = new Timer(1000, new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						CryptoGUI.this.statusLabel.setText("Status: Done!");
@@ -193,18 +189,18 @@ public class CryptoGUI extends JPanel {
 				timer.start();
 				CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
 			} catch (Exception ex) {
+				// error popup
 				CryptoGUI.this.statusLabel.setText("Status: Error!");
 				JOptionPane.showMessageDialog(CryptoGUI.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
-	
+	// listener for the decrypt button
 	private class DecryptListener implements ActionListener {
-
                 public void actionPerformed(ActionEvent e) {
-			
                         try {
+				// get output file
 				try {
 					if (CryptoGUI.this.selectFile.isDirectory()) {
 						CryptoGUI.this.outFile = new File(CryptoGUI.this.selectFile.getAbsolutePath() + "/" + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile.getAbsolutePath()) + ".dec." + CryptoGUI.getExtension(CryptoGUI.this.inFile.getAbsolutePath()));
@@ -214,8 +210,11 @@ public class CryptoGUI extends JPanel {
 				} catch (Exception e1) {
 					throw new MyCryptoUtils.CustomException(e1.getClass().getSimpleName());
 				}
-			
+				
+				// decrypt file
                                 MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
+				
+				// status report
 				Timer timer = new Timer(1000, new ActionListener() {
                                         public void actionPerformed(ActionEvent evt) {
                                                 CryptoGUI.this.statusLabel.setText("Status: Done!");
@@ -223,7 +222,8 @@ public class CryptoGUI extends JPanel {
                                 timer.setRepeats(false);
                                 timer.start();
                                 CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
-                        } catch (Exception ex) {
+                        } catch (Exception ex) {\
+				// error popup
 				CryptoGUI.this.statusLabel.setText("Status: Error!");
                         	if(ex.getMessage().equals("BadPaddingException")) {
                                         JOptionPane.showMessageDialog(CryptoGUI.this, "Incorrect key", "Error", JOptionPane.ERROR_MESSAGE);
@@ -234,8 +234,9 @@ public class CryptoGUI extends JPanel {
                 }
         }
 
-			
+	// run		
 	public static void main(String[] args) {
+		// create gui
 		JFrame frame = new JFrame("CryptoGUI");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setPreferredSize(new Dimension(300, 200));
