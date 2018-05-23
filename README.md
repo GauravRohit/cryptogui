@@ -1,4 +1,4 @@
-# CryptGUI
+# CryptoGUI
 ### Running the Program
 Make sure that you have the Java Runtime Environment installed: `java -version`.
 
