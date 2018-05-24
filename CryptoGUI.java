@@ -144,8 +144,8 @@ public class CryptoGUI extends JPanel {
 				return "Incorrect Key";
 			case "NullPointerException":
 				return "Select File(s)";
-			case "IllegalBlockSize":
-				return "File Not Encrypted"
+			case "IllegalBlockSizeException":
+				return "File Not Encrypted";
 			default:
 				return s;
 		}
