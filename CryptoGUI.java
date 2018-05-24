@@ -141,9 +141,11 @@ public class CryptoGUI extends JPanel {
 		String s = e.getMessage();
 		switch(s) {
 			case "BadPaddingException":
-				return "Incorrect key";
+				return "Incorrect Key";
 			case "NullPointerException":
-				return "Select file(s)";
+				return "Select File(s)";
+			case "IllegalBlockSize":
+				return "File Not Encrypted"
 			default:
 				return s;
 		}
