@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 import java.io.File;
 
 // Create a GUI to encrypt and decrypt files
@@ -35,6 +36,7 @@ public class CryptoGUI extends JPanel {
 
 		// init panels
 		setLayout(new GridBagLayout());
+		setBorder(new EmptyBorder(10, 10, 10, 10));
 		this.keyPanel = new JPanel(new GridBagLayout());
 		this.keyPanel2 = new JPanel(new BorderLayout());
 		this.inPanel = new JPanel(new GridBagLayout());
@@ -97,16 +99,16 @@ public class CryptoGUI extends JPanel {
 		add(this.inPanel, c);
 
 		c = createGBC(0, 0);
-                this.outPanel.add(this.outLabel, c);
+		this.outPanel.add(this.outLabel, c);
+		
+		c = createGBC(0, 1);
+		this.outPanel.add(this.outPane, c);
+		
+		c = createGBC(1, 1);
+		this.outPanel.add(this.outButton, c);
 
-                c = createGBC(0, 1);
-                this.outPanel.add(this.outPane, c);
-
-                c = createGBC(1, 1);
-                this.outPanel.add(this.outButton, c);
-
-                c = createGBC(0, 2);
-                add(this.outPanel, c);
+		c = createGBC(0, 2);
+		add(this.outPanel, c);
 
 		this.encryptPanel.add(this.encryptButton);
 		this.decryptPanel.add(this.decryptButton);
@@ -122,7 +124,7 @@ public class CryptoGUI extends JPanel {
 
 	// get file name without extension
 	private static String getNameNoExtension(String s) {
-		int sep = s.lastIndexOf("/") + 1;
+		int sep = s.lastIndexOf(File.separator) + 1;
 		String ss = s.substring(sep);
 		int dot = ss.indexOf(".");
 		return ss.substring(0, dot);
@@ -132,6 +134,19 @@ public class CryptoGUI extends JPanel {
 	private static String getExtension(String s) {
 		int dot = s.lastIndexOf(".") + 1;
 		return s.substring(dot);
+	}
+
+	// sets error messages
+	private static String getError(Exception e) {
+		String s = e.getMessage();
+		switch(s) {
+			case "BadPaddingException":
+				return "Incorrect key";
+			case "NullPointerException":
+				return "Select file(s)";
+			default:
+				return s;
+		}
 	}
 	
 	// listener for the input file button
@@ -161,19 +176,6 @@ public class CryptoGUI extends JPanel {
 			}
 		}
 	}
-
-	// sets error messages
-	private String getError(Exception e) {
-		String s = e.getMessage();
-		switch(s) {
-			case "BadPaddingException":
-				return "Incorrect key";
-			case "NullPointerException":
-				return "Select file(s)";
-			default:
-				return s;
-		}
-	}
 	
 	// listener for the encrypt button
 	private class EncryptListener implements ActionListener {
@@ -181,8 +183,8 @@ public class CryptoGUI extends JPanel {
 			try {
 				// get output file
 				try {
-					if (CryptoGUI.this.selectFile.isDirectory()) {
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.selectFile.getAbsolutePath() + "/" + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile.getAbsolutePath()) + ".enc." + CryptoGUI.getExtension(CryptoGUI.this.inFile.getAbsolutePath()));
+					if(CryptoGUI.this.selectFile.isDirectory()) {
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.selectFile.getAbsolutePath() + File.separator + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile.getAbsolutePath()) + ".enc." + CryptoGUI.getExtension(CryptoGUI.this.inFile.getAbsolutePath()));
 					} else {
 						CryptoGUI.this.outFile = CryptoGUI.this.selectFile;
 					}
@@ -216,8 +218,8 @@ public class CryptoGUI extends JPanel {
                         try {
 				// get output file
 				try {
-					if (CryptoGUI.this.selectFile.isDirectory()) {
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.selectFile.getAbsolutePath() + "/" + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile.getAbsolutePath()) + ".dec." + CryptoGUI.getExtension(CryptoGUI.this.inFile.getAbsolutePath()));
+					if(CryptoGUI.this.selectFile.isDirectory()) {
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.selectFile.getAbsolutePath() + File.separator + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile.getAbsolutePath()) + ".dec." + CryptoGUI.getExtension(CryptoGUI.this.inFile.getAbsolutePath()));
                         		} else {
 						CryptoGUI.this.outFile = CryptoGUI.this.selectFile;
 					}
@@ -249,9 +251,8 @@ public class CryptoGUI extends JPanel {
 	public static void main(String[] args) {
 		// create gui
 		JFrame frame = new JFrame("CryptoGUI");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setPreferredSize(new Dimension(300, 200));
-                frame.setResizable(false);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
 		frame.add(new CryptoGUI());
 		frame.pack();
 		frame.setVisible(true);
