@@ -161,6 +161,19 @@ public class CryptoGUI extends JPanel {
 			}
 		}
 	}
+
+	// sets error messages
+	private String getError(Exception e) {
+		String s = e.getMessage();
+		switch(s) {
+			case "BadPaddingException":
+				return "Incorrect key";
+			case "NullPointerException":
+				return "Select file(s)";
+			default:
+				return s;
+		}
+	}
 	
 	// listener for the encrypt button
 	private class EncryptListener implements ActionListener {
@@ -191,7 +204,8 @@ public class CryptoGUI extends JPanel {
 			} catch (Exception ex) {
 				// error popup
 				CryptoGUI.this.statusLabel.setText("Status: Error!");
-				JOptionPane.showMessageDialog(CryptoGUI.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				String errorMessage = CryptoGUI.getError(ex);
+				JOptionPane.showMessageDialog(CryptoGUI.this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -222,14 +236,11 @@ public class CryptoGUI extends JPanel {
                                 timer.setRepeats(false);
                                 timer.start();
                                 CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
-                        } catch (Exception ex) {\
+                        } catch (Exception ex) {
 				// error popup
 				CryptoGUI.this.statusLabel.setText("Status: Error!");
-                        	if(ex.getMessage().equals("BadPaddingException")) {
-                                        JOptionPane.showMessageDialog(CryptoGUI.this, "Incorrect key", "Error", JOptionPane.ERROR_MESSAGE);
-                                } else {
-                                        JOptionPane.showMessageDialog(CryptoGUI.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                }
+				String errorMessage = CryptoGUI.getError(ex);
+				JOptionPane.showMessageDialog(CryptoGUI.this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
 			}
                 }
         }
