@@ -165,7 +165,7 @@ public class CryptoGUI extends JPanel {
 				// file
 				if(CryptoGUI.this.selectFile.isFile()) {
 					// check file
-					if(!CryptoGUI.this.selectFile().getName().contains("enc")) {
+					if(!CryptoGUI.this.selectFile.getName().contains("enc")) {
 						// get output file
 						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
 
