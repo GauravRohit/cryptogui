@@ -186,8 +186,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.selectFile.delete();
 						}
 					} else {
-						CryptoGUI.this.statusLabel.setText("Status: Error!");
-						JOptionPane.showMessageDialog(CryptoGUI.this, "File Already Encrypted", "Error", JOptionPane.ERROR_MESSAGE);
+						CryptoGUI.this.statusLabel.setText("Status: File Already Encrypted");
 					}
 					   
 				// directory
@@ -242,10 +241,10 @@ public class CryptoGUI extends JPanel {
 					// check file
 					if(CryptoGUI.this.selectFile.getName().contains("enc")) {
 						// get output file
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + "." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
 
-						// encrypt file
-						MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
+						// decrypt file
+						MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
 
 						// status report
 						CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
@@ -275,7 +274,7 @@ public class CryptoGUI extends JPanel {
 							this.count++;
 							
 							// get output file
-							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.this.getExtension(fileList[i]));
+							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + "." + CryptoGUI.this.getExtension(fileList[i]));
 
 							// decrypt file
 							MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
@@ -292,7 +291,7 @@ public class CryptoGUI extends JPanel {
 					// status report
 					Timer timer = new Timer(1000, new ActionListener() {
 						public void actionPerformed(ActionEvent evt) {
-							CryptoGUI.this.statusLabel.setText("Status: " + EncryptListener.this.count + " File(s) Decrypted");
+							CryptoGUI.this.statusLabel.setText("Status: " + DecryptListener.this.count + " File(s) Decrypted");
 					}});
 					timer.setRepeats(false);
 					timer.start();
