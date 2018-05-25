@@ -185,6 +185,10 @@ public class CryptoGUI extends JPanel {
 						if(!CryptoGUI.this.selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
 							CryptoGUI.this.selectFile.delete();
 						}
+
+						// reset path
+						CryptoGUI.this.selectFile = CryptoGUI.this.outFile;
+						CryptoGUI.this.inArea.setText(CryptoGUI.this.selectFile.getAbsolutePath());
 					} else {
 						CryptoGUI.this.statusLabel.setText("Status: File Already Encrypted");
 					}
@@ -201,8 +205,8 @@ public class CryptoGUI extends JPanel {
 							// get output file
 							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.this.getExtension(fileList[i]));
 
-							// decrypt file
-							MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
+							// encrypt file
+							MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
 
 							// status report
 							CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
@@ -231,7 +235,7 @@ public class CryptoGUI extends JPanel {
 	}
 
 	// listener for the decrypt button
-	pprivate class DecryptListener implements ActionListener {
+	private class DecryptListener implements ActionListener {
 		private int count;
 
 		public void actionPerformed(ActionEvent e) {
@@ -259,9 +263,12 @@ public class CryptoGUI extends JPanel {
 						if(!CryptoGUI.this.selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
 							CryptoGUI.this.selectFile.delete();
 						}
+
+						// reset path
+						CryptoGUI.this.selectFile = CryptoGUI.this.outFile;
+						CryptoGUI.this.inArea.setText(CryptoGUI.this.selectFile.getAbsolutePath());
 					} else {
-						CryptoGUI.this.statusLabel.setText("Status: Error!");
-						JOptionPane.showMessageDialog(CryptoGUI.this, "File Not Encrypted", "Error", JOptionPane.ERROR_MESSAGE);
+						CryptoGUI.this.statusLabel.setText("Status: File Not Encrypted");
 					}
 					   
 				// directory
