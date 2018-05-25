@@ -7,6 +7,9 @@ import javax.swing.filechooser.*;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
 
 // Create a GUI to encrypt and decrypt files
 public class CryptoGUI extends JPanel {
@@ -16,6 +19,7 @@ public class CryptoGUI extends JPanel {
 	private JScrollPane keyPane, inPane;
 	private JButton inButton, encryptButton, decryptButton;
 	private File inFile, outFile;
+	private FileWriter fw;
 	
 	// create GridBagConstraints
 	private GridBagConstraints createGBC(int x, int y) {
@@ -32,6 +36,14 @@ public class CryptoGUI extends JPanel {
 		// init files
 		this.inFile = null;
 		this.outFile = null;
+
+		// init log
+		try {
+			File logFile = new File("log.txt");
+			logFile.createNewFile();
+			this.fw = new FileWriter(logFile, true);
+			this.fw.write("test");
+		} catch(IOException ioe) {}
 
 		// init panels
 		setLayout(new GridBagLayout());
@@ -51,6 +63,8 @@ public class CryptoGUI extends JPanel {
 		// init textareas
 		this.keyArea = new JTextArea(1, 22);
 		this.inArea = new JTextArea(1, 15);
+
+		this.inArea.setEditable(false);
 
 		// init scrollpanes
 		this.keyPane = new JScrollPane(this.keyArea, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -101,6 +115,13 @@ public class CryptoGUI extends JPanel {
 
 		c = createGBC(0, 4);
 		add(this.statusLabel, c);
+
+		// log
+		try {
+			this.fw.write("[" + LocalDate.now() + "]" + " Initialize Session");
+		} catch(IOException ioe) {
+			System.out.println(ioe.toString());
+		}
 	}
 
 	// get file name without extension
@@ -188,6 +209,11 @@ public class CryptoGUI extends JPanel {
 							}});
 						timer.setRepeats(false);
 						timer.start();
+						
+						// log
+						try {
+							CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Encrypt: " + CryptoGUI.this.inFile.getName());
+						} catch(IOException ioe) {}
 
 						// delete
 						CryptoGUI.this.inFile.delete();
@@ -217,6 +243,11 @@ public class CryptoGUI extends JPanel {
 							// status report
 							CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
 
+							// log
+							try {
+								CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Encrypt: " + fileList[i].getName());
+							} catch(IOException ioe) {}
+
 							// delete
 							fileList[i].delete();
 						}
@@ -233,6 +264,11 @@ public class CryptoGUI extends JPanel {
 				// status report
 				String errorMessage = CryptoGUI.getError(ex);
 				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
+				
+				// log
+				try {
+					CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Error: " + errorMessage);
+				} catch(IOException ioe) {}
 			}
 		}
 	}
@@ -262,6 +298,11 @@ public class CryptoGUI extends JPanel {
 						timer.setRepeats(false);
 						timer.start();
 
+						// log
+                                                try {
+                                                        CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Decrypt: " + CryptoGUI.this.inFile.getName());
+                                                } catch(IOException ioe) {}
+
 						// delete
 						CryptoGUI.this.inFile.delete();
 
@@ -289,6 +330,11 @@ public class CryptoGUI extends JPanel {
 
 							// status report
 							CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
+					
+							// log
+                                                	try {
+                                                        	CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Decrypt: " + CryptoGUI.this.inFile.getName());
+                                                	} catch(IOException ioe) {}
 
 							// delete
 							fileList[i].delete();
@@ -306,6 +352,11 @@ public class CryptoGUI extends JPanel {
 				// status report
 				String errorMessage = CryptoGUI.getError(ex);
 				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
+
+				// log
+				try {
+					CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Error: " + errorMessage);
+				} catch(IOException ioe) {}
 			}
 		}
 	}
