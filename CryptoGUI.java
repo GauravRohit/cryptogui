@@ -197,7 +197,7 @@ public class CryptoGUI extends JPanel {
 					// check file
 					if(!CryptoGUI.this.inFile.getName().contains("enc")) {
 						// get output file
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.inFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.inFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.inFile));
+						CryptoGUI.this.outFile = new File(CryptoGUI.getPath(CryptoGUI.this.inFile) + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile) + ".enc." + CryptoGUI.getExtension(CryptoGUI.this.inFile));
 
 						// encrypt file
 						MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
@@ -212,7 +212,7 @@ public class CryptoGUI extends JPanel {
 						timer.start();
 						
 						// log
-						CryptoGUI.this.log("Encrypt: " + CryptoGUI.this.inFile.getName());
+						CryptoGUI.log("Encrypt: " + CryptoGUI.this.inFile.getName());
 
 						// delete
 						CryptoGUI.this.inFile.delete();
@@ -234,7 +234,7 @@ public class CryptoGUI extends JPanel {
 							this.count++;
 							
 							// get output file
-							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.this.getExtension(fileList[i]));
+							CryptoGUI.this.outFile = new File(CryptoGUI.getPath(fileList[i]) + CryptoGUI.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.getExtension(fileList[i]));
 
 							// encrypt file
 							MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
@@ -243,7 +243,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
 
 							// log
-							CryptoGUI.this.log("Encrypt: " + fileList[i].getName());
+							CryptoGUI.log("Encrypt: " + fileList[i].getName());
 
 							// delete
 							fileList[i].delete();
@@ -263,7 +263,7 @@ public class CryptoGUI extends JPanel {
 				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
 				
 				// log
-				CryptoGUI.this.log("Error: " + errorMessage);
+				CryptoGUI.log("Error: " + errorMessage);
 
 			}
 		}
@@ -280,7 +280,7 @@ public class CryptoGUI extends JPanel {
 					// check file
 					if(CryptoGUI.this.inFile.getName().contains("enc")) {
 						// get output file
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.inFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.inFile) + "." + CryptoGUI.this.getExtension(CryptoGUI.this.inFile));
+						CryptoGUI.this.outFile = new File(CryptoGUI.getPath(CryptoGUI.this.inFile) + CryptoGUI.getNameNoExtension(CryptoGUI.this.inFile) + "." + CryptoGUI.getExtension(CryptoGUI.this.inFile));
 
 						// decrypt file
 						MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
@@ -295,7 +295,7 @@ public class CryptoGUI extends JPanel {
 						timer.start();
 
 						// log
-                        CryptoGUI.this.log("Decrypt: " + CryptoGUI.this.inFile.getName());
+                        CryptoGUI.log("Decrypt: " + CryptoGUI.this.inFile.getName());
 
 						// delete
 						CryptoGUI.this.inFile.delete();
@@ -317,7 +317,7 @@ public class CryptoGUI extends JPanel {
 							this.count++;
 							
 							// get output file
-							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + "." + CryptoGUI.this.getExtension(fileList[i]));
+							CryptoGUI.this.outFile = new File(CryptoGUI.getPath(fileList[i]) + CryptoGUI.getNameNoExtension(fileList[i]) + "." + CryptoGUI.getExtension(fileList[i]));
 
 							// decrypt file
 							MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
@@ -326,7 +326,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
 					
 							// log
-                            CryptoGUI.this.log("Decrypt: " + fileList[i].getName());
+                            CryptoGUI.log("Decrypt: " + fileList[i].getName());
 
 							// delete
 							fileList[i].delete();
@@ -346,16 +346,25 @@ public class CryptoGUI extends JPanel {
 				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
 
 				// log
-				CryptoGUI.this.log("Error: " + errorMessage);
+				CryptoGUI.log("Error: " + errorMessage);
 			}
 		}
+	}
+
+	public static void onExit() {
+		CryptoGUI.log("Close session");
+		System.exit(0);
 	}
 
 	// run		
 	public static void main(String[] args) {
 		// create gui
 		JFrame frame = new JFrame("CryptoGUI");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				onExit();
+		}});
 		frame.setResizable(false);
 		frame.add(new CryptoGUI());
 		frame.pack();
