@@ -158,53 +158,66 @@ public class CryptoGUI extends JPanel {
 	
 	// listener for the encrypt button
 	private class EncryptListener implements ActionListener {
-		private int i;
+		private int count;
 
 		public void actionPerformed(ActionEvent e) {
 			try {
 				// file
 				if(CryptoGUI.this.selectFile.isFile()) {
-					// get output file
-					CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
-					// encrypt file
-					MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
-				
-					// status report
-					CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
-					Timer timer = new Timer(1000, new ActionListener() {
-						public void actionPerformed(ActionEvent evt) {
-							CryptoGUI.this.statusLabel.setText("Status: 1 File Encrypted");
-						}});
-					timer.setRepeats(false);
-					timer.start();
-					
-					// delete
-					if(!selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
-						CryptoGUI.this.selectFile.delete();
+					// check file
+					if(!CryptoGUI.this.selectFile().getName().contains("enc")) {
+						// get output file
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
+
+						// encrypt file
+						MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
+
+						// status report
+						CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
+						Timer timer = new Timer(1000, new ActionListener() {
+							public void actionPerformed(ActionEvent evt) {
+								CryptoGUI.this.statusLabel.setText("Status: 1 File Encrypted");
+							}});
+						timer.setRepeats(false);
+						timer.start();
+
+						// delete
+						if(!CryptoGUI.this.selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
+							CryptoGUI.this.selectFile.delete();
+						}
+					} else {
+						CryptoGUI.this.statusLabel.setText("Status: Error!");
+						JOptionPane.showMessageDialog(CryptoGUI.this, "File Already Encrypted", "Error", JOptionPane.ERROR_MESSAGE);
 					}
-				
+					   
 				// directory
 				} else if(CryptoGUI.this.selectFile.isDirectory()) {
 					File[] fileList = CryptoGUI.this.selectFile.listFiles();
-					for(this.i = 0; this.i < fileList.length; this.i++) {
-						// get output file
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.this.getExtension(fileList[i]));
-						
-						// decrypt file
-						MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
-					
-						// status report
-						CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
+					this.count = 0;
+					for(int i = 0;  i < fileList.length; i++) {
+						if(!fileList[i].getName().contains("enc")) {
+							// bump count
+							this.count++;
+							
+							// get output file
+							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.this.getExtension(fileList[i]));
 
-						// delete
-						if(!fileList[i].getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
-							fileList[i].delete();
+							// decrypt file
+							MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
+
+							// status report
+							CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
+
+							// delete
+							if(!fileList[i].getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
+								fileList[i].delete();
+							}
 						}
 					}
 					// status report
 					Timer timer = new Timer(1000, new ActionListener() {
 						public void actionPerformed(ActionEvent evt) {
-							CryptoGUI.this.statusLabel.setText("Status: " + EncryptListener.this.i + " File(s) Encrypted");
+							CryptoGUI.this.statusLabel.setText("Status: " + EncryptListener.this.count + " File(s) Encrypted");
 					}});
 					timer.setRepeats(false);
 					timer.start();
