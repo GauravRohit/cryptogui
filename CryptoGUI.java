@@ -15,7 +15,7 @@ public class CryptoGUI extends JPanel {
 	private JTextArea keyArea, inArea;
 	private JScrollPane keyPane, inPane;
 	private JButton inButton, encryptButton, decryptButton;
-	private File selectFile, outFile;
+	private File inFile, outFile;
 	
 	// create GridBagConstraints
 	private GridBagConstraints createGBC(int x, int y) {
@@ -30,7 +30,7 @@ public class CryptoGUI extends JPanel {
 	// create CryptoGUI
 	public CryptoGUI() {
 		// init files
-		this.selectFile = null;
+		this.inFile = null;
 		this.outFile = null;
 
 		// init panels
@@ -128,16 +128,24 @@ public class CryptoGUI extends JPanel {
 
 	// sets error messages
 	private static String getError(Exception e) {
-		String s = e.getMessage();
-		switch(s) {
-			case "BadPaddingException":
-				return "Incorrect Key";
-			case "NullPointerException":
-				return "Select File(s)";
-			case "IllegalBlockSizeException":
-				return "File Not Encrypted";
-			default:
-				return s;
+		if(e.getClass().getSimpleName().equals("CustomException")) {
+			String s = e.getMessage();
+			switch(s) {
+				case "BadPaddingException":
+					return "Incorrect Key";
+				case "IllegalBlockSizeException":
+					return "File Not Encrypted";
+				default:
+					return s;
+			}
+		} else {
+			String s = e.getClass().getSimpleName();
+			switch(s) {
+				case "NullPointerException":
+					return "No Files Selected";
+				default:
+					return s;
+			}
 		}
 	}
 	
@@ -149,8 +157,8 @@ public class CryptoGUI extends JPanel {
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			int val = fc.showOpenDialog(CryptoGUI.this);
 			if(val == JFileChooser.APPROVE_OPTION) {
-				CryptoGUI.this.selectFile = fc.getSelectedFile();
-				CryptoGUI.this.inArea.setText(CryptoGUI.this.selectFile.getAbsolutePath());
+				CryptoGUI.this.inFile = fc.getSelectedFile();
+				CryptoGUI.this.inArea.setText(CryptoGUI.this.inFile.getAbsolutePath());
 			}
 		}
 	}
@@ -163,14 +171,14 @@ public class CryptoGUI extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			try {
 				// file
-				if(CryptoGUI.this.selectFile.isFile()) {
+				if(CryptoGUI.this.inFile.isFile()) {
 					// check file
-					if(!CryptoGUI.this.selectFile.getName().contains("enc")) {
+					if(!CryptoGUI.this.inFile.getName().contains("enc")) {
 						// get output file
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.inFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.inFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.inFile));
 
 						// encrypt file
-						MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
+						MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
 
 						// status report
 						CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
@@ -182,20 +190,18 @@ public class CryptoGUI extends JPanel {
 						timer.start();
 
 						// delete
-						if(!CryptoGUI.this.selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
-							CryptoGUI.this.selectFile.delete();
-						}
+						CryptoGUI.this.inFile.delete();
 
 						// reset path
-						CryptoGUI.this.selectFile = CryptoGUI.this.outFile;
-						CryptoGUI.this.inArea.setText(CryptoGUI.this.selectFile.getAbsolutePath());
+						CryptoGUI.this.inFile = CryptoGUI.this.outFile;
+						CryptoGUI.this.inArea.setText(CryptoGUI.this.inFile.getAbsolutePath());
 					} else {
 						CryptoGUI.this.statusLabel.setText("Status: File Already Encrypted");
 					}
 					   
 				// directory
-				} else if(CryptoGUI.this.selectFile.isDirectory()) {
-					File[] fileList = CryptoGUI.this.selectFile.listFiles();
+				} else if(CryptoGUI.this.inFile.isDirectory()) {
+					File[] fileList = CryptoGUI.this.inFile.listFiles();
 					this.count = 0;
 					for(int i = 0;  i < fileList.length; i++) {
 						if(!fileList[i].getName().contains("enc")) {
@@ -212,9 +218,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
 
 							// delete
-							if(!fileList[i].getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
-								fileList[i].delete();
-							}
+							fileList[i].delete();
 						}
 					}
 					// status report
@@ -226,10 +230,9 @@ public class CryptoGUI extends JPanel {
 					timer.start();
 				}
 			} catch (Exception ex) {
-				// error popup
-				CryptoGUI.this.statusLabel.setText("Status: Error!");
+				// status report
 				String errorMessage = CryptoGUI.getError(ex);
-				JOptionPane.showMessageDialog(CryptoGUI.this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
 			}
 		}
 	}
@@ -241,14 +244,14 @@ public class CryptoGUI extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			try {
 				// file
-				if(CryptoGUI.this.selectFile.isFile()) {
+				if(CryptoGUI.this.inFile.isFile()) {
 					// check file
-					if(CryptoGUI.this.selectFile.getName().contains("enc")) {
+					if(CryptoGUI.this.inFile.getName().contains("enc")) {
 						// get output file
-						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + "." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.inFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.inFile) + "." + CryptoGUI.this.getExtension(CryptoGUI.this.inFile));
 
 						// decrypt file
-						MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
+						MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
 
 						// status report
 						CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
@@ -260,20 +263,18 @@ public class CryptoGUI extends JPanel {
 						timer.start();
 
 						// delete
-						if(!CryptoGUI.this.selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
-							CryptoGUI.this.selectFile.delete();
-						}
+						CryptoGUI.this.inFile.delete();
 
 						// reset path
-						CryptoGUI.this.selectFile = CryptoGUI.this.outFile;
-						CryptoGUI.this.inArea.setText(CryptoGUI.this.selectFile.getAbsolutePath());
+						CryptoGUI.this.inFile = CryptoGUI.this.outFile;
+						CryptoGUI.this.inArea.setText(CryptoGUI.this.inFile.getAbsolutePath());
 					} else {
 						CryptoGUI.this.statusLabel.setText("Status: File Not Encrypted");
 					}
 					   
 				// directory
-				} else if(CryptoGUI.this.selectFile.isDirectory()) {
-					File[] fileList = CryptoGUI.this.selectFile.listFiles();
+				} else if(CryptoGUI.this.inFile.isDirectory()) {
+					File[] fileList = CryptoGUI.this.inFile.listFiles();
 					this.count = 0;
 					for(int i = 0;  i < fileList.length; i++) {
 						if(fileList[i].getName().contains("enc")) {
@@ -290,9 +291,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
 
 							// delete
-							if(!fileList[i].getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
-								fileList[i].delete();
-							}
+							fileList[i].delete();
 						}
 					}
 					// status report
@@ -304,10 +303,9 @@ public class CryptoGUI extends JPanel {
 					timer.start();
 				}
 			} catch (Exception ex) {
-				// error popup
-				CryptoGUI.this.statusLabel.setText("Status: Error!");
+				// status report
 				String errorMessage = CryptoGUI.getError(ex);
-				JOptionPane.showMessageDialog(CryptoGUI.this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
 			}
 		}
 	}
