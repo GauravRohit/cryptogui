@@ -8,8 +8,9 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 // Create a GUI to encrypt and decrypt files
 public class CryptoGUI extends JPanel {
@@ -20,6 +21,7 @@ public class CryptoGUI extends JPanel {
 	private JButton inButton, encryptButton, decryptButton;
 	private File inFile, outFile;
 	private FileWriter fw;
+	private BufferedWriter bw;
 	
 	// create GridBagConstraints
 	private GridBagConstraints createGBC(int x, int y) {
@@ -36,14 +38,6 @@ public class CryptoGUI extends JPanel {
 		// init files
 		this.inFile = null;
 		this.outFile = null;
-
-		// init log
-		try {
-			File logFile = new File("log.txt");
-			logFile.createNewFile();
-			this.fw = new FileWriter(logFile, true);
-			this.fw.write("test");
-		} catch(IOException ioe) {}
 
 		// init panels
 		setLayout(new GridBagLayout());
@@ -117,11 +111,18 @@ public class CryptoGUI extends JPanel {
 		add(this.statusLabel, c);
 
 		// log
+		log("Initialize Session");
+	}
+
+	private static void log(String s) {
 		try {
-			this.fw.write("[" + LocalDate.now() + "]" + " Initialize Session");
-		} catch(IOException ioe) {
-			System.out.println(ioe.toString());
-		}
+			File logFile = new File("log.txt");
+			logFile.createNewFile();
+			FileWriter fw = new FileWriter(logFile, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("[" + LocalDateTime.now() + "] " + s + System.getProperty("line.separator"));
+			bw.close();
+		} catch(IOException ioe) {}
 	}
 
 	// get file name without extension
@@ -211,9 +212,7 @@ public class CryptoGUI extends JPanel {
 						timer.start();
 						
 						// log
-						try {
-							CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Encrypt: " + CryptoGUI.this.inFile.getName());
-						} catch(IOException ioe) {}
+						CryptoGUI.this.log("Encrypt: " + CryptoGUI.this.inFile.getName());
 
 						// delete
 						CryptoGUI.this.inFile.delete();
@@ -244,9 +243,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.statusLabel.setText("Status: Encrypting...");
 
 							// log
-							try {
-								CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Encrypt: " + fileList[i].getName());
-							} catch(IOException ioe) {}
+							CryptoGUI.this.log("Encrypt: " + fileList[i].getName());
 
 							// delete
 							fileList[i].delete();
@@ -266,9 +263,8 @@ public class CryptoGUI extends JPanel {
 				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
 				
 				// log
-				try {
-					CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Error: " + errorMessage);
-				} catch(IOException ioe) {}
+				CryptoGUI.this.log("Error: " + errorMessage);
+
 			}
 		}
 	}
@@ -299,9 +295,7 @@ public class CryptoGUI extends JPanel {
 						timer.start();
 
 						// log
-                                                try {
-                                                        CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Decrypt: " + CryptoGUI.this.inFile.getName());
-                                                } catch(IOException ioe) {}
+                        CryptoGUI.this.log("Decrypt: " + CryptoGUI.this.inFile.getName());
 
 						// delete
 						CryptoGUI.this.inFile.delete();
@@ -332,9 +326,7 @@ public class CryptoGUI extends JPanel {
 							CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
 					
 							// log
-                                                	try {
-                                                        	CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Decrypt: " + CryptoGUI.this.inFile.getName());
-                                                	} catch(IOException ioe) {}
+                            CryptoGUI.this.log("Decrypt: " + fileList[i].getName());
 
 							// delete
 							fileList[i].delete();
@@ -354,9 +346,7 @@ public class CryptoGUI extends JPanel {
 				CryptoGUI.this.statusLabel.setText("Status: " + errorMessage);
 
 				// log
-				try {
-					CryptoGUI.this.fw.write("[" + LocalDate.now() + "]" + " Error: " + errorMessage);
-				} catch(IOException ioe) {}
+				CryptoGUI.this.log("Error: " + errorMessage);
 			}
 		}
 	}
