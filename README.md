@@ -1,9 +1,10 @@
 # CryptoGUI
-### Running the Program
+### Requirements
 Make sure that you have the Java Runtime Environment installed: `java -version`.
-
-Download the `CryptoGUI.jar` file and double click to run. If you are on Linux you may have to give the file permission to execute: `$ chmod +x CryptoGui.jar`
-
+### Running the Program
+Download the `CryptoGUI.jar` file and double click to run. If you are on Linux you may have to give the file permission to execute: `$ chmod +x CryptoGui.jar`.
+### Building the Program
+If you wish to build the jar yourself download the `*.java` files and compile: `javac CryptoGUI.java`. Download the `CryptoGUI.mf` file and build: `jar cvfm  <jarfilename>.jar CryptoGUI.mf *.class`.
 ### Features
 Key: Enter the key you wish to encrypt your file with.  
 Input: Select an input file.  
