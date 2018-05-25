@@ -15,7 +15,7 @@ public class CryptoGUI extends JPanel {
 	private JTextArea keyArea, inArea;
 	private JScrollPane keyPane, inPane;
 	private JButton inButton, encryptButton, decryptButton;
-	private File inFile, outFile, selectFile;
+	private File selectFile, outFile;
 	
 	// create GridBagConstraints
 	private GridBagConstraints createGBC(int x, int y) {
@@ -30,7 +30,7 @@ public class CryptoGUI extends JPanel {
 	// create CryptoGUI
 	public CryptoGUI() {
 		// init files
-		this.inFile = null;
+		this.selectFile = null;
 		this.outFile = null;
 
 		// init panels
@@ -232,34 +232,79 @@ public class CryptoGUI extends JPanel {
 	}
 
 	// listener for the decrypt button
-	private class DecryptListener implements ActionListener {
-                public void actionPerformed(ActionEvent e) {
-                        try {
-				// get output file
-				CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.inFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.inFile) + "." + CryptoGUI.this.getExtension(CryptoGUI.this.inFile));
-				
-				// decrypt file
-                                MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.inFile, CryptoGUI.this.outFile);
-				
-				// status report
-				Timer timer = new Timer(1000, new ActionListener() {
-                                        public void actionPerformed(ActionEvent evt) {
-                                                CryptoGUI.this.statusLabel.setText("Status: Done!");
-                                        }});
-                                timer.setRepeats(false);
-                                timer.start();
-                                CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
+	pprivate class DecryptListener implements ActionListener {
+		private int count;
 
-				// delete input file
-				CryptoGUI.this.inFile.delete();
-                        } catch (Exception ex) {
+		public void actionPerformed(ActionEvent e) {
+			try {
+				// file
+				if(CryptoGUI.this.selectFile.isFile()) {
+					// check file
+					if(CryptoGUI.this.selectFile.getName().contains("enc")) {
+						// get output file
+						CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(CryptoGUI.this.selectFile) + CryptoGUI.this.getNameNoExtension(CryptoGUI.this.selectFile) + ".enc." + CryptoGUI.this.getExtension(CryptoGUI.this.selectFile));
+
+						// encrypt file
+						MyCryptoUtils.encrypt(CryptoGUI.this.keyArea.getText(), CryptoGUI.this.selectFile, CryptoGUI.this.outFile);
+
+						// status report
+						CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
+						Timer timer = new Timer(1000, new ActionListener() {
+							public void actionPerformed(ActionEvent evt) {
+								CryptoGUI.this.statusLabel.setText("Status: 1 File Decrypted");
+							}});
+						timer.setRepeats(false);
+						timer.start();
+
+						// delete
+						if(!CryptoGUI.this.selectFile.getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
+							CryptoGUI.this.selectFile.delete();
+						}
+					} else {
+						CryptoGUI.this.statusLabel.setText("Status: Error!");
+						JOptionPane.showMessageDialog(CryptoGUI.this, "File Not Encrypted", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					   
+				// directory
+				} else if(CryptoGUI.this.selectFile.isDirectory()) {
+					File[] fileList = CryptoGUI.this.selectFile.listFiles();
+					this.count = 0;
+					for(int i = 0;  i < fileList.length; i++) {
+						if(fileList[i].getName().contains("enc")) {
+							// bump count
+							this.count++;
+							
+							// get output file
+							CryptoGUI.this.outFile = new File(CryptoGUI.this.getPath(fileList[i]) + CryptoGUI.this.getNameNoExtension(fileList[i]) + ".enc." + CryptoGUI.this.getExtension(fileList[i]));
+
+							// decrypt file
+							MyCryptoUtils.decrypt(CryptoGUI.this.keyArea.getText(), fileList[i], CryptoGUI.this.outFile);
+
+							// status report
+							CryptoGUI.this.statusLabel.setText("Status: Decrypting...");
+
+							// delete
+							if(!fileList[i].getAbsolutePath().equals(CryptoGUI.this.outFile.getAbsolutePath())) {
+								fileList[i].delete();
+							}
+						}
+					}
+					// status report
+					Timer timer = new Timer(1000, new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+							CryptoGUI.this.statusLabel.setText("Status: " + EncryptListener.this.count + " File(s) Decrypted");
+					}});
+					timer.setRepeats(false);
+					timer.start();
+				}
+			} catch (Exception ex) {
 				// error popup
 				CryptoGUI.this.statusLabel.setText("Status: Error!");
 				String errorMessage = CryptoGUI.getError(ex);
 				JOptionPane.showMessageDialog(CryptoGUI.this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
 			}
-                }
-        }
+		}
+	}
 
 	// run		
 	public static void main(String[] args) {
