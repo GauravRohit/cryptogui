@@ -352,7 +352,7 @@ public class CryptoGUI extends JPanel {
 	}
 
 	public static void onExit() {
-		CryptoGUI.log("Close session");
+		CryptoGUI.log("Close Session");
 		System.exit(0);
 	}
 
